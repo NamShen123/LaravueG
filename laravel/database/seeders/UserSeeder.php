@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
                 "name" => "admin",
                 "email" => "admin@adminer.com",
                 "password" => Hash::make(User::DEFAULT_PASSWORD),
-                "departments_id	" => $adminRole->id,
+                "departments_id" => $adminRole->id,
                 "status_id" => $activeStatus->id
             ]);
         }
