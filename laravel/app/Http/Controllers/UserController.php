@@ -6,7 +6,9 @@ use App\Models\Departments;
 use App\Models\User;
 use App\Models\UserStatus;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -24,7 +26,7 @@ class UserController extends Controller
         ]);
     }
 
-    function index()
+    function index(Request $request)
     {
         $userData = [];
         $users = User::with(['department', 'status'])->get();
@@ -55,11 +57,12 @@ class UserController extends Controller
 
     function store(Request $request)
     {
-        if (!$request->headers->has('Accept')) {
-            $request->headers->set('Accept', 'application/json');
-        }
 
-        $validated = $request->validate(
+        $request->headers->set('Accept', 'application/json');
+
+
+        $validated = Validator::make(
+            $request->all(),
             [
                 "status_id" => "required|exists:user_status,id",
                 "username" => "required|unique:users,username",
@@ -77,15 +80,19 @@ class UserController extends Controller
                 "email.unique" => "Email đã tồn tại",
                 "departments_id.required" => "Chọn vai trò",
                 "password.required" => "Nhập mật khẩu",
-                
+
                 "password_confirmation.same" => "Mật khẩu không trùng khớp",
-                
+
                 "username.unique" => "Tên đăng nhập đã tồn tại",
-                
+
                 "status_id.exists" => "Trạng thái không tồn tại",
                 "departments_id.exists" => "Vai trò không tồn tại",
             ],
         );
+
+        if ($validated->fails()) {
+            return response()->json($validated->errors(), Response::HTTP_BAD_REQUEST);
+        }
 
 
         User::create([
@@ -99,7 +106,7 @@ class UserController extends Controller
 
         return response()->json([
             "message" => "Tạo tài khoản thành công!"
-        ],JSON_UNESCAPED_UNICODE);
+        ], JSON_UNESCAPED_UNICODE);
     }
 
     function edit($id)
@@ -111,11 +118,12 @@ class UserController extends Controller
 
     function update(Request $request, $id)
     {
-        $validated = $request->validate(
+        $validated = Validator::make(
+            $request->all(),
             [
                 "status_id" => "required|exists:user_status,id",
                 "name" => "required",
-                "email" => 'required|unique:users,email,'.$id,
+                "email" => 'required|unique:users,email,' . $id,
                 "departments_id" => "required|exists:departments,id",
             ],
             [
@@ -123,23 +131,28 @@ class UserController extends Controller
                 "name.required" => "Nhập họ và tên",
                 "email.required" => "Nhập email",
                 "departments_id.required" => "Chọn vai trò",
-                
+
                 "email.unique" => "Email đã tồn tại",
-                
+
                 "status_id.exists" => "Trạng thái không tồn tại",
                 "departments_id.exists" => "Vai trò không tồn tại",
             ],
         );
 
+        if ($validated->fails()) {
+            return response()->json($validated->errors(), Response::HTTP_BAD_REQUEST);
+        }
+
         $currentUser = User::findOrFail($id);
-        
+
         $currentUser->name = $request["name"];
         $currentUser->status_id = $request["status_id"];
         $currentUser->email = $request["email"];
         $currentUser->departments_id = $request["departments_id"];
 
         if ($request->isChangePassword) {
-            $request->validate(
+            $validator = Validator::make(
+                $request->all(),
                 [
                     "password" => "required",
                     "password_confirmation" => "same:password",
@@ -149,6 +162,10 @@ class UserController extends Controller
                     "password_confirmation.same" => "Mật khẩu không trùng khớp",
                 ]
             );
+
+            if ($validator->fails()) {
+                return response()->json($validated->errors(), Response::HTTP_BAD_REQUEST);
+            }
 
             $currentUser->password = Hash::make($request['password']);
         }

@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { 
+    Form,
     Modal,
     Checkbox,
     Input,
@@ -18,6 +19,8 @@ import router from './router/index.js';
 import App from './App.vue';
 import { createPinia } from 'pinia';
 import axios from 'axios';
+
+axios.defaults.headers.common['Accept'] = 'application/json';
 window.axios = axios;
 
 
@@ -38,6 +41,7 @@ app.component('font-awesome-icon', FontAwesomeIcon);
 app.use(router);
 app.use(Button);
 app.use(Modal);
+app.use(Form);
 app.use(Checkbox);
 app.use(Select);
 app.use(Input);

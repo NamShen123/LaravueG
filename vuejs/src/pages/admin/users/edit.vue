@@ -168,11 +168,19 @@ import { defineComponent, ref, reactive, toRefs } from 'vue';
 import { useMenu } from '../../../stores/useMenu';
 import { message } from 'ant-design-vue';
 import { useRoute } from 'vue-router';
-import axios from 'axios';
+import { api } from '../../../helper/api';
+import { useRouter } from 'vue-router';
+
 
 export default defineComponent({
 
     setup() {
+
+        const router = useRouter();
+
+        api.attachToken();
+        api.setHeaderCommon('Accept', 'application/json');
+
         useMenu().onSelectedKeys(['1']);
 
         const route =  useRoute ();
@@ -234,7 +242,12 @@ export default defineComponent({
                 users.departments_id = response.data.departments_id;
                 users.status_id = response.data.status_id;
             } catch (error) {
-                console.error(error);
+                if (error.status === 401) {
+                    message.warning('Phiên đăng nhập hết hạn');
+                    router.push({ name: 'login' });
+                } else {
+                    console.error(error);
+                }
             }
         }
 
@@ -245,8 +258,13 @@ export default defineComponent({
                 const response = await axios.post(`http://127.0.0.1:8000/api/users/${route.params.id}`, users);
                 message.success('Cập nhật tài khoản thành công');
             } catch (error) {
-                console.error(error);
-                errors.value = error.response.data.errors;
+                if (error.status === 401) {
+                    message.warning('Phiên đăng nhập hết hạn');
+                    router.push({ name: 'login' });
+                } else {
+                    console.error(error);
+                    errors.value = error.response.data;
+                }
             }
         }
 
@@ -257,6 +275,9 @@ export default defineComponent({
 
         const success = () => {
             message.success("Cập nhật tài khoản thành công");
+        };
+        const warning = () => {
+            message.warning('This is a warning message');
         };
 
         return {
@@ -270,6 +291,7 @@ export default defineComponent({
             filterOption,
             success,
             userEdit,
+            warning,
         }
     }
 })

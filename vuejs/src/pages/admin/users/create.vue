@@ -161,10 +161,16 @@ import { defineComponent, ref, reactive, toRefs } from 'vue';
 import { useMenu } from '../../../stores/useMenu';
 import { message } from 'ant-design-vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../../stores/useAuth';
+import { api } from '../../../helper/api';
 
 export default defineComponent({
 
     setup() {
+
+        api.attachToken();
+        api.setHeaderCommon('Accept', 'application/json');
+
         useMenu().onSelectedKeys(['1']);
 
         const router = useRouter();
@@ -208,20 +214,32 @@ export default defineComponent({
                 }
 
             } catch (error) {
-                console.error(response);
+                if (error.status === 401) {
+                    message.warning('Phiên đăng nhập hết hạn');
+                    router.push({ name: 'login' });
+                } else {
+                    console.error(error);
+                }
             }
         }
 
         const createUsers = async () => {
             try {
                 const response = await axios.post("http://127.0.0.1:8000/api/users", users);
+                console.log(response.data);
                 if (response) {
                     message.success("Tạo mới thành công");
-                    router.push({name: 'admin-users'});
+                    router.push({ name: 'admin-users' });
                 }
             } catch (error) {
-                console.error(error);
-                errors.value = error.response.data.errors;
+                if (error.status === 401) {
+                    message.warning('Phiên đăng nhập hết hạn');
+                    router.push({ name: 'login' });
+                } else {
+                    console.error(error);
+                    errors.value = error.response.data;
+                }
+
             }
         }
 
@@ -235,6 +253,10 @@ export default defineComponent({
             message.success('This is a success message');
         };
 
+        const warning = () => {
+            message.warning('This is a warning message');
+        };
+
         return {
             user_status,
             departments,
@@ -245,6 +267,7 @@ export default defineComponent({
             filterOption,
             createUsers,
             success,
+            warning,
         }
     }
 })

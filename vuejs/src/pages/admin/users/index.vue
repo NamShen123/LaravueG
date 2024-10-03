@@ -41,7 +41,7 @@
                             </router-link>
 
 
-                            <a-button @click="showPromiseConfirm(record.id)">
+                            <a-button @click="deleteUser(record.id)">
                                 <font-awesome-icon :icon="['fas', 'trash']" />
                             </a-button>
 
@@ -62,9 +62,13 @@ import { createVNode } from 'vue';
 import { Modal } from 'ant-design-vue';
 import { message } from 'ant-design-vue';
 import axios from 'axios';
+import { api } from '../../../helper/api';
+import { useRouter } from 'vue-router';
 export default defineComponent({
     setup() {
         useMenu().onSelectedKeys(['1']);
+
+        const router = useRouter();
 
         const columns = [
             {
@@ -106,18 +110,27 @@ export default defineComponent({
 
         const users = ref([]);
 
+        api.attachToken();
+        api.setHeaderCommon('Accept', 'application/json');
+
+
         const getUsers = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:8000/api/users');
                 users.value = response.data;
             } catch (error) {
-                console.error(error);
+                if (error.status === 401) {
+                    message.warning('Phiên đăng nhập hết hạn');
+                    router.push({ name: 'login' });
+                } else {
+                    console.error(error);
+                }
             }
         };
 
         getUsers();
 
-        const showPromiseConfirm = (userId) => {
+        const deleteUser = (userId) => {
             Modal.confirm({
                 title: 'Bạn muốn xóa người dùng này?',
                 icon: createVNode(ExclamationCircleOutlined),
@@ -133,7 +146,12 @@ export default defineComponent({
                             message.success("Xóa thành công");
                         });
                     } catch (error) {
-                        return console.error(error);
+                        if (error.status === 401) {
+                            message.warning('Phiên đăng nhập hết hạn');
+                            router.push({ name: 'login' });
+                        } else {
+                            console.error(error);
+                        }
                     }
                 },
                 onCancel() { },
@@ -143,13 +161,17 @@ export default defineComponent({
         const success = () => {
             message.success("success");
         };
+        const warning = () => {
+            message.warning('This is a warning message');
+        };
 
         return {
             users,
             columns,
 
-            showPromiseConfirm,
+            deleteUser,
             success,
+            warning,
         }
     }
 });
