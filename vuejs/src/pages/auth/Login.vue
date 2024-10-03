@@ -26,11 +26,25 @@
                   <span>Thông tin đăng nhập không chính xác</span>
                 </a-form-item>
 
+
+
                 <a-form-item>
-                  <a-button color="#0c713d" type="primary" html-type="submit" style="width: 100%;"
-                    :disabled="formState.username === '' || formState.password === ''">
-                    Log in
-                  </a-button>
+                  <div class="d-flex justify-content-between">
+                    <div style="width: 62%;">
+                      <a-button :block="true" type="primary" html-type="submit" style="width: 100%;"
+                        :disabled="formState.username === '' || formState.password === ''">
+                        Đăng nhập
+                      </a-button>
+                    </div>
+                    <div style="width: 36%;">
+                      <router-link :to="{ name: 'register' }">
+                        <a-button :block="true" html-type="submit" style="width: 100%; padding-left:0.5em; padding-right: 0.5em;">
+                          Đăng ký
+                        </a-button>
+                      </router-link>
+                    </div>
+
+                  </div>
                 </a-form-item>
 
               </div>

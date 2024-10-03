@@ -13,4 +13,8 @@ export
         setHeaderCommon: (key, value) => {
             axios.defaults.headers.common[key] = value;
         },
+
+        clearToken: () => {
+            delete axios.defaults.headers.common['Authorization'];
+        }
     }

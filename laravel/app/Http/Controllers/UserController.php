@@ -58,9 +58,6 @@ class UserController extends Controller
     function store(Request $request)
     {
 
-        $request->headers->set('Accept', 'application/json');
-
-
         $validated = Validator::make(
             $request->all(),
             [
@@ -184,5 +181,51 @@ class UserController extends Controller
         return response()->json([
             "message" => "Xóa thành công",
         ]);
+    }
+
+    function userRegister(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                "username" => "required|unique:users,username",
+                "name" => "required",
+                "email" => "required|unique:users,email",
+                "password" => "required",
+                "password_confirmation" => "same:password",
+            ],
+            [
+                "username.required" => "Nhập tên đăng nhập",
+                "name.required" => "Nhập họ và tên",
+                "email.required" => "Nhập email",
+                "password.required" => "Nhập mật khẩu",
+                
+                "password_confirmation.same" => "Mật khẩu không trùng khớp",
+                
+                "username.unique" => "Tên đăng nhập đã tồn tại",
+                "email.unique" => "Email đã tồn tại",
+
+            ],
+        );
+
+        if ($validated->fails()) {
+            return response()->json($validated->errors(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $userRole = Departments::where('name', Departments::USER)->first();
+        $activeStatus = UserStatus::where('name', UserStatus::ACTIVE)->first();
+
+        User::create([
+            'username' => $request->username,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'status_id' => $activeStatus->id,
+            'departments_id' => $userRole->id,
+        ]);
+
+        return response()->json([
+            "message" => "Tạo tài khoản thành công!"
+        ], JSON_UNESCAPED_UNICODE);
     }
 }
