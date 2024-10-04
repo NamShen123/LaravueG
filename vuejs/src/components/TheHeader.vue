@@ -13,7 +13,9 @@
             </div>
 
             <div class="col-sm-3 d-none d-sm-flex align-items-center justify-content-sm-end">
-                <span>Admin</span>
+                <a-button @click="logout()" type="primary" danger>
+                    <font-awesome-icon class="exitIcon" :icon="['fas', 'sign-out-alt']" />
+                </a-button>
             </div>
 
             <div class="col-1 d-flex d-sm-none align-items-center justify-content-center">
@@ -25,21 +27,26 @@
     </div>
 
     <a-drawer v-model:open="open" title="DANH MỤC" placement="left">
-        <TheMenu/>
+        <TheMenu />
     </a-drawer>
 
     <a-drawer v-model:open="open_user" title="ADMIN" placement="right">
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <a-button style="width: 100%;" @click="logout()" type="primary" danger>
+            <font-awesome-icon class="exitIcon" :icon="['fas', 'sign-out-alt']" />
+        </a-button>
     </a-drawer>
 </template>
 
 <script setup>
+import { api } from '../helper/api';
 import TheMenu from './TheMenu.vue';
 import { ref } from 'vue';
+import { message } from 'ant-design-vue';
+import { useRouter } from 'vue-router';
+
 const open = ref(false);
 const open_user = ref(false);
+const router = useRouter();
 
 const showDrawer = () => {
     open.value = true;
@@ -48,4 +55,39 @@ const showDrawer = () => {
 const showDrawerUser = () => {
     open_user.value = true;
 };
+
+api.attachToken();
+api.setHeaderCommon('Accept', 'application/json');
+const logout = async () => {
+
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/api/logout');
+        api.clearToken();
+        message.success("Kết thúc phiên làm việc");
+        router.push({ name: 'login' });
+    } catch (error) {
+        if (error.status === 401) {
+            message.warning("Phiên làm việc đã hết hạn từ trước");
+            router.push({ name: 'login' });
+        } else {
+            console.error(error);
+        }
+    }
+
+}
+
+const success = () => {
+    message.success('This is a success message');
+};
+
+const warning = () => {
+    message.warning('This is a warning message');
+};
+
 </script>
+
+<style>
+.exitIcon {
+    transform: rotateZ(180deg);
+}
+</style>

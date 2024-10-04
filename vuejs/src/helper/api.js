@@ -16,5 +16,6 @@ export
 
         clearToken: () => {
             delete axios.defaults.headers.common['Authorization'];
+            useAuthStore().clearToken()
         }
     }

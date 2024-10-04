@@ -8,7 +8,7 @@
               src="../../assets/riot-games.png" />
           </div>
         </template>
-        <a-card-meta title="Login">
+        <a-card-meta>
           <template #description>
             <a-form layout="inline" :model="formState" @finish="handleFinish">
               <div class="d-flex flex-column">

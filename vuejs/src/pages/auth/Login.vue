@@ -7,16 +7,18 @@
             <img style="max-width: 200px; max-height: 200px;" alt="example" src="../../assets/riot-games.png" />
           </div>
         </template>
-        <a-card-meta title="Login">
+        <a-card-meta>
           <template #description>
             <a-form layout="inline" :model="formState" @finish="handleFinish">
               <div class="d-flex flex-column">
                 <a-form-item class="mb-1">
+                  <small class="mt-1">Tên đăng nhập</small>
                   <a-input v-model:value="formState.username" placeholder="Username">
                     <template #prefix></template>
                   </a-input>
                 </a-form-item>
                 <a-form-item class="mb-1">
+                  <small class="mt-1">Mật khẩu</small>
                   <a-input v-model:value="formState.password" type="password" placeholder="Password">
                     <template #prefix></template>
                   </a-input>
@@ -28,7 +30,7 @@
 
 
 
-                <a-form-item>
+                <a-form-item class="mt-1">
                   <div class="d-flex justify-content-between">
                     <div style="width: 62%;">
                       <a-button :block="true" type="primary" html-type="submit" style="width: 100%;"
@@ -63,6 +65,8 @@ import { reactive, ref } from 'vue';
 import { useAuthStore } from '../../stores/useAuth';
 import { useRouter } from 'vue-router';
 import { api } from '../../helper/api';
+import { message } from 'ant-design-vue';
+
 
 const formState = reactive({
   username: '',
@@ -92,6 +96,7 @@ const handleFinish = async () => {
     // Hanlde for basic role
     switch (user.rolename) {
       case "ADMIN":
+        message.success('Đăng nhập thành công!');
         router.push({ name: 'admin-users' })
         break;
       case "USER":
@@ -113,6 +118,11 @@ const handleFinish = async () => {
   }
 
 };
+
+const success = () => {
+  message.success('This is a success message');
+};
+
 </script>
 
 <style>
