@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\CallSlipController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     
     Route::get('/books', [BookController::class, 'index']);
+    Route::post('/callSlips', [CallSlipController::class, 'store']);
 
 
 

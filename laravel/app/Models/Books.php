@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,6 +42,18 @@ class Books extends Model
     public function callSlipBooks(): HasMany
     {
         return $this->hasMany(CallSlipBook::class);
+    }
+
+
+
+    /** Scope 
+     * 
+    ****************/
+
+    function scopeBorringByUser(Builder $query, $userId) {
+        $query->whereHas('callSlips', function($q) use ($userId) {
+            $q->where('user_id', $userId)->where('status', CallSlip::NEW);
+        });
     }
 
 }

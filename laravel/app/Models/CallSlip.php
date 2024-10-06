@@ -12,6 +12,10 @@ class CallSlip extends Model
 {
     use HasFactory;
 
+    const DEADLINE_MONTH = 3;
+    
+    const NEW = "NEW";
+
     protected $table = 'call_slip';
 
     protected $fillable = [
