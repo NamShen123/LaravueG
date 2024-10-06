@@ -125,7 +125,7 @@ const success = () => {
 
 </script>
 
-<style>
+<style scoped>
 .loginBox {
   margin-top: 100px;
 }

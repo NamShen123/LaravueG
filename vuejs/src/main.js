@@ -1,5 +1,8 @@
 import { createApp } from 'vue'
 import { 
+    Typography,
+    Pagination,
+    Anchor,
     Form,
     Modal,
     Checkbox,
@@ -13,7 +16,7 @@ import {
     List,
     Drawer,
     Button,
-    message
+    message,
 } from 'ant-design-vue';
 import router from './router/index.js';
 import App from './App.vue';
@@ -40,6 +43,9 @@ const app  = createApp(App);
 app.component('font-awesome-icon', FontAwesomeIcon);
 app.use(router);
 app.use(Button);
+app.use(Typography);
+app.use(Pagination);
+app.use(Anchor);
 app.use(Modal);
 app.use(Form);
 app.use(Checkbox);

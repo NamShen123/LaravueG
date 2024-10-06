@@ -9,7 +9,7 @@
 
             <div class="col-10 col-sm-9 d-flex align-items-center justify-content-center justify-content-sm-start">
                 <img src="../assets/riot-games.png" alt="Logo" height="32" width="34" class="ms-3 me-3">
-                <span class="d-none d-sm-flex">QUẢN TRỊ</span>
+                <span class="d-none d-sm-flex">Người dùng</span>
             </div>
 
             <div class="col-sm-3 d-none d-sm-flex align-items-center justify-content-sm-end">
@@ -27,7 +27,7 @@
     </div>
 
     <a-drawer v-model:open="open" title="DANH MỤC" placement="left">
-        <TheMenu />
+        <TheMenuUser />
     </a-drawer>
 
     <a-drawer v-model:open="open_user" title="ADMIN" placement="right">
@@ -39,7 +39,7 @@
 
 <script setup>
 import { api } from '../helper/api';
-import TheMenu from './TheMenu.vue';
+import TheMenuUser from './TheMenuUser.vue';
 import { ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { useRouter } from 'vue-router';
