@@ -22,7 +22,7 @@ class Books extends Model
         'author',
         'price',
         'quantity',
-        'status_id	',
+        'status_id',
     ];
 
     /**

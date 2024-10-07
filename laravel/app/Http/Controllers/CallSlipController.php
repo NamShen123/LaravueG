@@ -47,13 +47,14 @@ class CallSlipController extends Controller
         }
 
         $borringBook =  Books::borringByUser($user->id)->get();
+
         if (!$borringBook->isEmpty()) {
             $invalidBooks =  $borringBook->whereIn('id', $request->book_ids);
             if (!$invalidBooks->isEmpty()) {
                 return response()->json([
                     "message" => "Phiếu có sách đã đăng ký",
                     "borrowed_book" => $borringBook,
-                ]);
+                ], Response::HTTP_CONFLICT);
             }
         }
 
@@ -75,5 +76,27 @@ class CallSlipController extends Controller
         return response()->json([
             'message' => "Tạo phiếu mượn thành công"
         ]);
+    }
+
+    function show($id)
+    {
+        $callSlip = CallSlip::where('id', $id)->with(['books', 'user', 'staff'])->firstOrFail();
+        return response()->json([
+            'id' => $callSlip->id,
+            'start' => $callSlip->start,
+            'end' => $callSlip->end,
+            'return_date' => $callSlip->return_date,
+            'deposit' => $callSlip->deposit,
+            'user_id' => $callSlip->user_id,
+            'staff_id' => $callSlip->staff_id,
+            'cancel_reason' => $callSlip->cancel_reason,
+            'status' => $callSlip->status,
+        ]);
+    }
+
+    function showForUser(Request $request) {
+        $user = $request->user();
+        $callSlips = CallSlip::with(['books', 'user', 'staff'])->where('user_id', $user->id)->get();
+        return response()->json($callSlips);
     }
 }

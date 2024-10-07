@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { 
+    Badge,
     Typography,
     Pagination,
     Anchor,
@@ -42,6 +43,7 @@ const pinia = createPinia();
 const app  = createApp(App);
 app.component('font-awesome-icon', FontAwesomeIcon);
 app.use(router);
+app.use(Badge);
 app.use(Button);
 app.use(Typography);
 app.use(Pagination);

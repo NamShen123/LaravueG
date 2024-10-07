@@ -37,8 +37,7 @@ Route::middleware('auth:sanctum')->group(function(){
     
     Route::get('/books', [BookController::class, 'index']);
     Route::post('/callSlips', [CallSlipController::class, 'store']);
-
-
+    Route::get('/callSlips/user', [CallSlipController::class, 'showForUser']);
 
 
     Route::post('/logout', [AuthController::class, 'logout']);

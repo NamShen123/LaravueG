@@ -26,6 +26,8 @@ class CallSlip extends Model
         'deposit',
         'user_id',
         'staff_id',
+        'cancel_reason',
+        'status',
     ];
 
     /**
