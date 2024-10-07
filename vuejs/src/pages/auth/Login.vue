@@ -100,7 +100,8 @@ const handleFinish = async () => {
         router.push({ name: 'admin-users' })
         break;
       case "USER":
-
+        message.success('Đăng nhập thành công!');
+        router.push({ name: 'user-books' })
         break;
       case "STAFF":
 

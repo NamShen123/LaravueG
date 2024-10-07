@@ -15,4 +15,13 @@ class BookController extends Controller
         ->paginate(12);
         return response()->json($books);
     }
+
+    function userBooks(Request $request) {
+        $user = $request->user();
+
+        $borringBooks = Books::borringByUser($user->id)->get();
+        return response()->json([
+            'borring_books' => $borringBooks
+        ]);
+    }
 }

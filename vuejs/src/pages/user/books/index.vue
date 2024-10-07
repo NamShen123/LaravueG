@@ -16,7 +16,7 @@
                                     {{ book.description }}
                                 </div>
 
-                                <div class="text-end mb-2">
+                                <div class="text-end mb-2 ellipsis-twoline">
                                     <a-typography-text :code="true" class="font-italic">{{ book.author
                                         }}</a-typography-text>
                                 </div>
@@ -26,19 +26,23 @@
                                 </div>
 
                                 <div>
-                                    <div v-if="callSlip.hasBookId(book.id)" >
-                                        <a-button 
-                                            @click="removeBookFromCallSlip(book)"
-                                            class="cancelButton" type="primary"
-                                            style="margin-top: 1em; width: 100%;">
+                                    <div v-if="userBooks.hasBookId(book.id)">
+                                        <a-button class="borringButton"
+                                            type="primary" style="margin-top: 1em; width: 100%;">
+                                            <HistoryOutlined/>
+                                        </a-button>
+                                    </div>
+
+
+                                    <div v-else-if="callSlip.hasBookId(book.id)">
+                                        <a-button @click="callSlip.remove(book);" class="cancelButton"
+                                            type="primary" style="margin-top: 1em; width: 100%;">
                                             Hủy
                                         </a-button>
                                     </div>
 
                                     <div v-else-if="book.quantity > 0">
-                                        <a-button
-                                            @click="addBookToCallSlip(book)"
-                                            class="addButton" type="primary"
+                                        <a-button @click="callSlip.storage(book)" class="addButton" type="primary"
                                             style="margin-top: 1em; width: 100%;">
                                             Thêm
                                         </a-button>
@@ -66,7 +70,34 @@
 
         <!-- Books -->
         <div v-else-if="noTitleKey === 'myBooks'">
-            Books content
+
+            <div class="row">
+                <div v-for="book in userBooks.borring_books.current_items" class="col-6 col-sm-3 mb-4">
+                    <a-badge-ribbon text="đang mượn" color="gold">
+                        <a-card hoverable >
+                            <template #cover>
+                                <img alt="book" src="../../../assets/bookCover.avif" />
+                            </template>
+                            <a-card-meta :title="book.name">
+                                <template #description>
+                                    <div class="ellipsis-multiline">
+                                        {{ book.description }}
+                                    </div>
+
+                                    <div class="text-end mb-2 ellipsis-twoline">
+                                        <a-typography-text :code="true" class="font-italic">{{ book.author
+                                            }}</a-typography-text>
+                                    </div>
+
+                                    <div class="text-end mb-2">
+                                        <a-typography-text>{{ money.format(book.price) }}</a-typography-text>
+                                    </div>
+                                </template>
+                            </a-card-meta>
+                        </a-card>
+                    </a-badge-ribbon>
+                </div>
+            </div>
         </div>
         <div v-else>Ngoại lệ phát sinh</div>
 
@@ -83,8 +114,10 @@ import { api } from '../../../helper/api.js'
 import { money } from '../../../helper/money.js';
 import {
     PlusOutlined,
+    HistoryOutlined,
 } from '@ant-design/icons-vue';
 import { useCallSlip } from '../../../stores/useCallSlip.js';
+import { useUserBooks } from '../../../stores/useUserBooks.js';
 
 const router = useRouter();
 
@@ -103,6 +136,10 @@ const tabListNoTitle = [
 const noTitleKey = ref('library');
 const onTabChange = (value) => {
     noTitleKey.value = value;
+
+    if (value === 'myBooks') {
+        getUserBooks();
+    }
 };
 
 const booksData = reactive({
@@ -114,6 +151,7 @@ const booksData = reactive({
 })
 
 const callSlip = useCallSlip();
+
 
 api.attachToken();
 api.setHeaderCommon();
@@ -149,26 +187,46 @@ const goPage = (page) => {
     getBooks();
 }
 
-const addBookToCallSlip = (book) => {
-    callSlip.storage(book);
+const userBooks = useUserBooks();
+
+
+api.attachToken();
+api.setHeaderCommon();
+const getUserBooks = async () => {
+    try {
+        const response = await axios.get("http://localhost:8000/api/books/user");
+        userBooks.empty();
+        userBooks.massStorage(response.data.borring_books);
+    } catch (error) {
+        if (error.status === 401) {
+            message.warning("Hết hạn phiên đăng nhập");
+            router.push({ name: 'login' });
+        } else {
+            console.error(error);
+        }
+    }
 }
 
-const removeBookFromCallSlip = (book) => {
-    callSlip.remove(book);
+if (!userBooks.isFetch) {
+    getUserBooks();
+    userBooks.isFetch = true;
 }
 
-
-const success = () => {
-    message.success("success");
-};
-const warning = () => {
-    message.warning('This is a warning message');
-};
 
 </script>
 
 <style scoped>
 .ellipsis-multiline {
+    min-height: 5em;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.ellipsis-twoline {
     min-height: 5em;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -187,23 +245,23 @@ const warning = () => {
     color: black;
 }
 
-.addButton.clicked {
-    background-color: #FFCCCB;
-    color: black;
-}
-
-.addButton.clicked:hover {
-    background-color: #FFCCCB;
-    color: black;
-}
-
-.cancelButton{
+.cancelButton {
     background-color: #FFCCCB;
     color: black;
 }
 
 .cancelButton:hover {
     background-color: #FFCCCB;
+    color: black;
+}
+
+.borringButton {
+    background-color: rgb(250, 173, 20);
+    color: black;
+}
+
+.borringButton:hover {
+    background-color: rgb(250, 173, 20);
     color: black;
 }
 </style>

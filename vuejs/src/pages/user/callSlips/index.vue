@@ -37,7 +37,7 @@
         <!-- list call slip -->
         <div v-else-if="noTitleKey === 'callSlips'">
 
-            <div v-for="userCallSlip in  callSlips.current_items">
+            <div v-for="userCallSlip in callSlips.current_items">
                 <a-badge-ribbon :text="userCallSlip.status">
                     <a-card :title="`Phiếu mượn #${userCallSlip.id}`" size="small">
                         <div class="mb-1" v-for="book in userCallSlip.books">
@@ -49,7 +49,13 @@
                             Đã thanh toán: <a-typography-text keyboard>{{ userCallSlip.deposit }}</a-typography-text>
                         </div>
                         <div class="mb-1">
-                            Người duyệt: <a-typography-text code>{{ userCallSlip.staff_id ?? 'chờ duyệt' }}</a-typography-text>
+                            Người duyệt: 
+                            <a-tag v-if="!userCallSlip.staff" color="processing">
+                                <template #icon>
+                                    <sync-outlined :spin="true" />
+                                </template>
+                                đang duyệt
+                            </a-tag>
                         </div>
                     </a-card>
                 </a-badge-ribbon>
@@ -73,6 +79,7 @@ import {
     PlusOutlined,
     ClearOutlined,
     ExportOutlined,
+    SyncOutlined,
 } from '@ant-design/icons-vue';
 import { responsiveHelper } from '../../../helper/responsiveHelper';
 import { useRouter } from 'vue-router';

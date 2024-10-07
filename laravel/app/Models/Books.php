@@ -56,4 +56,23 @@ class Books extends Model
         });
     }
 
+    function scopeActive (Builder $query) {
+        $query->whereHas('status', function($q) {
+            $q->where('name', BookStatus::ACTIVE);
+        });
+    }
+
+    function scopeDeActive (Builder $query) {
+        $query->whereHas('status', function($q) {
+            $q->where('name', BookStatus::DEACTIVE);
+        });
+    }
+
+    function scopeAvaliable (Builder $query) {
+        $query->where('quantity', '>', 0);
+    }
+
+    function scopeOutOfStock (Builder $query) {
+        $query->where('quantity', '<=', 0);
+    }
 }
